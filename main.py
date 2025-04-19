@@ -1,36 +1,41 @@
-from fastapi import FastAPI, File, UploadFile
+from fastapi import FastAPI, UploadFile, File
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
-import numpy as np
-import cv2
-import io
 from PIL import Image
+import numpy as np
+import io
 import pickle
 
 app = FastAPI()
 
-# إضافة CORS middleware
+# CORS to allow requests from frontend
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # ده بيخلي السيرفر يقبل الطلبات من أي مكان
+    allow_origins=["*"],  # غيّري دي لو عندك URL محدد
     allow_credentials=True,
-    allow_methods=["*"],  # بيخلي السيرفر يقبل كل أنواع الـ HTTP methods
-    allow_headers=["*"],  # بيخلي السيرفر يقبل كل أنواع الـ headers
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
-# تحميل النموذج
-with open("XGB-Tuned-balancedPalm.pkl", "rb") as f:
+# Load the pickle model
+with open("XGB-Tuned-balancedpalm.pk1", "rb") as f:  # <-- غيّري الاسم لو مختلف
     model = pickle.load(f)
 
+# Image preprocessing
+def preprocess_image(image_data):
+    image = Image.open(io.BytesIO(image_data)).convert("RGB")
+    image = image.resize((224, 224))  # ممكن تعدّلي المقاس حسب اللي الموديل محتاجه
+    image_array = np.array(image) / 255.0  # normalize to 0-1
+    flat = image_array.flatten().reshape(1, -1)  # Flatten to 1D
+    return flat
+
+# API Endpoint
 @app.post("/predict")
-async def predict(file: UploadFile = File(...)):
-    contents = await file.read()
-    image = Image.open(io.BytesIO(contents)).convert("RGB")
-
-    img = np.array(image)
-    img_resized = cv2.resize(img, (224, 224))
-    img_flatten = img_resized.flatten().reshape(1, -1)
-
-    prediction = model.predict(img_flatten)
-    result = "Anemia Detected" if prediction[0] == 1 else "Normal"
-    return JSONResponse(content={"prediction": result})
+async def predict_anemia(file: UploadFile = File(...)):
+    try:
+        contents = await file.read()
+        processed_image = preprocess_image(contents)
+        prediction = model.predict(processed_image)
+        label = "Anemic" if prediction[0] == 1 else "Non-Anemic"
+        return {"label": label}
+    except Exception as e:
+        return {"error": str(e)}
