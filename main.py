@@ -1,6 +1,7 @@
 from fastapi import FastAPI, File, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
+from fastapi.staticfiles import StaticFiles
 import numpy as np
 import cv2
 import io
@@ -18,6 +19,10 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# تقديم الملفات الساكنة (زي index.html)
+app.mount("/", StaticFiles(directory=".", html=True), name="static")
+
+# تحميل النموذج
 with open("XGB-Tuned-balancedPalm.pkl", "rb") as f:
     model = pickle.load(f)
 
