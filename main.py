@@ -39,3 +39,11 @@ async def predict_anemia(file: UploadFile = File(...)):
         return {"label": label}
     except Exception as e:
         return {"error": str(e)}
+        from fastapi.responses import HTMLResponse
+
+@app.get("/")
+async def serve_html():
+    with open("index.html", "r") as f:
+        html_content = f.read()
+    return HTMLResponse(content=html_content)
+
