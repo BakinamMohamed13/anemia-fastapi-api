@@ -3,8 +3,32 @@
 <head>
   <meta charset="UTF-8">
   <title>Anemia Checker</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      padding: 30px;
+      max-width: 600px;
+      margin: auto;
+    }
+    h2 {
+      color: #2c3e50;
+    }
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
+      background-color: #2ecc71;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    #result {
+      margin-top: 20px;
+      font-weight: bold;
+    }
+  </style>
 </head>
-<body style="font-family: sans-serif; padding: 30px;">
+<body>
   <h2>Upload Image to Check Anemia</h2>
   <form id="upload-form">
     <input type="file" name="file" id="file" accept="image/*" required />
@@ -12,7 +36,7 @@
     <button type="submit">Check</button>
   </form>
 
-  <h3 id="result" style="margin-top: 20px;"></h3>
+  <h3 id="result"></h3>
 
   <script>
     const form = document.getElementById("upload-form");
@@ -24,16 +48,24 @@
       const formData = new FormData();
       formData.append("file", fileInput.files[0]);
 
+      result.textContent = "Checking...";
+
       try {
-        const res = await fetch("https://anemia-fastapi-api.bekamouhammed13.repl.co/predict", {
+        const res = await fetch("/predict", {
           method: "POST",
           body: formData
         });
 
         const data = await res.json();
-        result.innerText = "Result: " + (data.label || data.error);
+        if (data.label) {
+          result.textContent = "Result: " + data.label;
+        } else if (data.error) {
+          result.textContent = "Error: " + data.error;
+        } else {
+          result.textContent = "Unexpected response.";
+        }
       } catch (err) {
-        result.innerText = "Error: " + err.message;
+        result.textContent = "Error: " + err.message;
       }
     });
   </script>
