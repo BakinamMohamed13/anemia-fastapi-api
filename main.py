@@ -1,5 +1,6 @@
 from fastapi import FastAPI, UploadFile, File
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import HTMLResponse
 from PIL import Image
 import numpy as np
 import io
@@ -28,7 +29,7 @@ def preprocess_image(image_data):
     flat = image_array.flatten().reshape(1, -1)  # Flatten to 1D
     return flat
 
-# API Endpoint
+# API Endpoint for prediction
 @app.post("/predict")
 async def predict_anemia(file: UploadFile = File(...)):
     try:
@@ -39,11 +40,10 @@ async def predict_anemia(file: UploadFile = File(...)):
         return {"label": label}
     except Exception as e:
         return {"error": str(e)}
-        from fastapi.responses import HTMLResponse
 
+# Serve the HTML page for the frontend form
 @app.get("/")
 async def serve_html():
     with open("index.html", "r") as f:
         html_content = f.read()
     return HTMLResponse(content=html_content)
-
