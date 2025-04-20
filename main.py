@@ -5,6 +5,7 @@ from PIL import Image
 import numpy as np
 import io
 import pickle
+import uvicorn
 
 app = FastAPI()
 
@@ -47,3 +48,7 @@ async def serve_html():
     with open("index.html", "r") as f:
         html_content = f.read()
     return HTMLResponse(content=html_content)
+
+# Start the server when the script is run directly
+if __name__ == "__main__":
+    uvicorn.run(app, host="0.0.0.0", port=8000)  # تأكد من تغيير المنفذ إلى 8000
