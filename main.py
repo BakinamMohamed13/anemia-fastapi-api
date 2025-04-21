@@ -24,11 +24,16 @@ with open("XGB-Tuned-balancedPalm.pkl", "rb") as f:
 # دالة معالجة الصورة
 def preprocess_image(image_data):
     try:
+        # فتح الصورة
         image = Image.open(io.BytesIO(image_data)).convert("RGB")
+        
+        # تغيير الحجم بما يتناسب مع المدخلات المدربة عليه
         image = image.resize((224, 224))  # تأكد إن ده هو الحجم اللي الموديل متدرب عليه
+        
+        # تحويل الصورة إلى مصفوفة numpy
         image_array = np.array(image) / 255.0  # تطبيع البيانات
-        flat = image_array.flatten().reshape(1, -1)
-        return flat
+        image_array = image_array.flatten().reshape(1, -1)  # تحويل الصورة إلى مصفوفة خطية
+        return image_array
     except Exception as e:
         raise ValueError(f"Image processing error: {str(e)}")
 
@@ -36,11 +41,19 @@ def preprocess_image(image_data):
 @app.post("/predict")
 async def predict_anemia(file: UploadFile = File(...)):
     try:
+        # قراءة محتويات الصورة
         contents = await file.read()
+        
+        # معالجة الصورة
         processed_image = preprocess_image(contents)
+        
+        # التنبؤ باستخدام الموديل
         prediction = model.predict(processed_image)
+        
+        # عرض النتيجة
         label = "Anemic" if prediction[0] == 1 else "Non-Anemic"
         return {"label": label}
+    
     except Exception as e:
         return {"error": f"Error: {str(e)}"}
 
