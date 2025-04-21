@@ -19,7 +19,7 @@ app.add_middleware(
 )
 
 # Load the pickle model
-with open("XGB-Tuned-balancedpalm.pk1", "rb") as f:  # Change the name if needed
+with open("XGB-Tuned-balancedpalm.pkl", "rb") as f:  # Change the name if needed
     model = pickle.load(f)
 
 # Image preprocessing
