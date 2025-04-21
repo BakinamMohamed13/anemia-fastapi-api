@@ -43,3 +43,8 @@ async def predict_anemia(file: UploadFile = File(...)):
         return {"label": label}
     except Exception as e:
         return {"error": f"Error: {str(e)}"}
+
+# مسار رئيسي للتأكد إن السيرفر شغال
+@app.get("/")
+def root():
+    return {"message": "Anemia detection API is running!"}
