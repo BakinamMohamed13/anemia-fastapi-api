@@ -1,6 +1,5 @@
 from fastapi import FastAPI, UploadFile, File
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import HTMLResponse
 from PIL import Image
 import numpy as np
 import io
@@ -45,13 +44,6 @@ async def predict_anemia(file: UploadFile = File(...)):
     except Exception as e:
         return {"error": f"Error: {str(e)}"}
 
-# Serve the HTML page for the frontend form
-@app.get("/")
-async def serve_html():
-    with open("index.html", "r") as f:
-        html_content = f.read()
-    return HTMLResponse(content=html_content)
-
 # Start the server when the script is run directly
 if __name__ == "__main__":
-    uvicorn.run(app, host="0.0.0.0", port=8000)  # Ensure port 8000 is used
+    uvicorn.run(app, host="0.0.0.0", port=10000)  # Ensure port 10000 is used
