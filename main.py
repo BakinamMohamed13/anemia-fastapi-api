@@ -18,7 +18,7 @@ app.add_middleware(
 )
 
 # تحميل الموديل باستخدام pickle
-with open("XGB-Tuned-balancedPalm.pkl", "rb") as f:
+with open("RF-balancedPalm.pkl", "rb") as f:
     model = pickle.load(f)
 
 # دالة معالجة الصورة
